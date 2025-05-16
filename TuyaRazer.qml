@@ -9,8 +9,8 @@ Item {
 
         Image {
             source: "https://github.com/BKMEN/signalrgb-tuya-battletron/blob/main/assets/logo.png?raw=true"
-            width: 64
-            height: 64
+            width: 120
+            height: 120
             fillMode: Image.PreserveAspectFit
             anchors.horizontalCenter: parent.horizontalCenter
         }
