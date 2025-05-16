@@ -32,6 +32,11 @@ export default {
     // "mn60o1u7xv8qh8f1": { leds: [1,2,3] },
     "stmkcsykq3kheboa": { leds: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], name: "Battletron Light Bar" },
     "yrg6a649fkozp1hw": { leds: [1], name: "Battletron Ball Light" },
+    "bfbebb82be7220f985rawa": { leds: [1,2,3,4], name: "Tuya Strip 1" },
+"bfde5007394a05833ahsda": { leds: [1,2,3,4], name: "Tuya Strip 2" },
+"bfbe7bd231444751090bsq": { leds: [1,2,3,4], name: "Tuya Strip 3" },
+"bfafad43febddb888apxbj": { leds: [1,2,3,4], name: "Tuya Strip 4" },
+
     // "m2jqc9ocwnxdsgs8": { leds: [1,2,3] },
     // "8cml7rj948sagivg": { leds: [1,2,3] },
     // "hy57lewrecoee6hv": { leds: [1,2,3] },
