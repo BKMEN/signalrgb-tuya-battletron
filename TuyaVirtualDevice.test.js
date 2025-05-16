@@ -8,7 +8,6 @@ export default class TuyaVirtualDevice extends BaseClass
     constructor(deviceData)
     {
         super();
-        // Initialize tuya device from saved data
         this.tuyaDevice = new TuyaDevice(deviceData, null);
         this.frameDelay = 50;
         this.lastRender = 0;
@@ -19,8 +18,7 @@ export default class TuyaVirtualDevice extends BaseClass
     getLedNames()
     {
         let ledNames = [];
-        for (let i = 1; i <= this.ledCount; i++)
-        {
+        for (let i = 1; i <= this.ledCount; i++) {
             ledNames.push(`Led ${i}`);
         }
         return ledNames;
@@ -29,8 +27,7 @@ export default class TuyaVirtualDevice extends BaseClass
     getLedPositions()
     {
         let ledPositions = [];
-        for (let i = 0; i < this.ledCount; i++)
-        {
+        for (let i = 0; i < this.ledCount; i++) {
             ledPositions.push([i, 0]);
         }
         return ledPositions;
@@ -39,31 +36,32 @@ export default class TuyaVirtualDevice extends BaseClass
     setupDevice(tuyaDevice)
     {
         this.tuyaLeds = DeviceList[tuyaDevice.deviceType].leds;
-        this.ledCount = this.tuyaLeds.length;
+
+        // Usa ledCount guardado si está definido, si no, usa los del tipo
+        this.ledCount = tuyaDevice.ledCount && tuyaDevice.ledCount > 0
+            ? tuyaDevice.ledCount
+            : this.tuyaLeds.length;
 
         this.ledNames = this.getLedNames();
         this.ledPositions = this.getLedPositions();
 
         device.setName(tuyaDevice.getName());
-
         device.setSize([this.ledCount, 1]);
         device.setControllableLeds(this.ledNames, this.ledPositions);
     }
 
     render(lightingMode, forcedColor, now)
     {
-        if (now - this.lastRender > this.frameDelay)
-        {
+        if (now - this.lastRender > this.frameDelay) {
             this.lastRender = now;
             let RGBData = [];
-            switch(lightingMode)
-            {
+
+            switch(lightingMode) {
                 case "Canvas":
                     RGBData = this.getDeviceRGB();
                     break;
                 case "Forced":
-                    for (let i = 0; i < this.ledCount; i++)
-                    {
+                    for (let i = 0; i < this.ledCount; i++) {
                         RGBData.push(this.hexToRGB(forcedColor));
                     }
                     break;
@@ -77,36 +75,30 @@ export default class TuyaVirtualDevice extends BaseClass
     getDeviceRGB()
     {
         const RGBData = [];
-    
         for (let i = 0; i < this.ledPositions.length; i++) {
             const ledPosition = this.ledPositions[i];
             const color = device.color(ledPosition[0], ledPosition[1]);
             RGBData.push(color);
         }
-    
         return RGBData;
     }
 
     generateColorString(colors)
     {
-        let spliceLength = this.tuyaLeds.length;
-        if (colors.length == 1) spliceLength = 1;
+        let spliceLength = this.ledCount;
+        if (colors.length === 1) spliceLength = 1;
 
-        if (spliceLength === 1)
-        {
+        if (spliceLength === 1) {
             const [h1, s1, v1] = this.rgbToHsv(colors[0]);
             let color = this.getW32FromHex(h1.toString(16), 2).toString(Hex) +
                         this.getW32FromHex(parseInt(s1 / 10).toString(16), 1).toString(Hex) +
                         this.getW32FromHex(parseInt(v1 / 10).toString(16), 1).toString(Hex);
 
             return color + "00000100";
-        }
-        else
-        {
+        } else {
             let colorArray = [];
 
-            for (let color of colors)
-            {
+            for (let color of colors) {
                 const [h, s, v] = this.rgbToHsv(color);
                 colorArray.push(
                     this.getW32FromHex(h.toString(16), 2).toString(Hex) +
@@ -116,9 +108,7 @@ export default class TuyaVirtualDevice extends BaseClass
             }
 
             let colorString = '';
-
-            for (let i = 0; i < this.tuyaLeds.length; i++)
-            {
+            for (let i = 0; i < this.ledCount; i++) {
                 colorString += this.zeroPad(i + 1, 2);
             }
 
