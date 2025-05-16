@@ -1,48 +1,83 @@
-import BaseClass from './Libs/BaseClass.test.js';
+import TuyaDevice from './TuyaDevice.test.js';
 import DeviceList from './Data/DeviceList.test.js';
 
-export default class TuyaController extends BaseClass {
-    constructor(tuyaDevice) {
-        super();
-        this.enabled = false;
-        this.id = tuyaDevice.id;
-        this.tuyaDevice = tuyaDevice;
-        this.deviceList = this.getDevices();
+export default class TuyaController {
+    constructor(deviceData) {
+        this.tuyaDevice = new TuyaDevice(deviceData, null);
 
-        this.tuyaDevice.on('device:initialized', this.deviceInitialized.bind(this));
+        this.deviceList = [];
+        Object.keys(DeviceList).forEach((key) => {
+            this.deviceList.push({
+                key: parseInt(key),
+                deviceName: DeviceList[key].name
+            });
+        });
     }
 
-    deviceInitialized() {
-        service.log('Device initialized');
-        service.log(this);
-
-        this.enabled = true;
-        service.removeController(this);
-        service.addController(this);
-        service.announceController(this);
+    get tuyaId() {
+        return this.tuyaDevice.id;
     }
 
-    getDevices() {
-        let devices = [
-            { key: 0, deviceName: 'Select device type' }
-        ];
-        let keys = Object.keys(DeviceList);
-        for (const key of keys) {
-            devices.push({ key: key, deviceName: DeviceList[key].name });
+    get tuyaIp() {
+        return this.tuyaDevice.ip;
+    }
+
+    get tuyaKey() {
+        return this.tuyaDevice.localKey;
+    }
+
+    get tuyaName() {
+        return this.tuyaDevice.name;
+    }
+
+    get tuyaVersion() {
+        return this.tuyaDevice.version;
+    }
+
+    get tuyaEnabled() {
+        return this.tuyaDevice.enabled;
+    }
+
+    get deviceType() {
+        return this.tuyaDevice.deviceType;
+    }
+
+    get deviceList() {
+        return this.deviceList;
+    }
+
+    // ✅ ACTUALIZADO: nuevo parámetro ledCount
+    validateDeviceUpdate(enabled, deviceType, localKey, ledCount = null) {
+        let shouldSave = false;
+
+        if (this.tuyaDevice.enabled !== enabled) {
+            shouldSave = true;
         }
-        return devices;
-    }
 
-    validateDeviceUpdate(enabled, deviceType, localKey) {
-        return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey);
-    }
-
-    updateDevice(enabled, deviceType, localKey) {
-        this.tuyaDevice.updateDevice(enabled, deviceType, localKey);
-
-        // Controller should already exist, but check anyway
-        if (service.hasController(this.id)) {
-            service.updateController(this);
+        if (this.tuyaDevice.deviceType !== deviceType) {
+            shouldSave = true;
         }
+
+        if (this.tuyaDevice.localKey !== localKey) {
+            shouldSave = true;
+        }
+
+        if (
+            ledCount !== null &&
+            this.tuyaDevice.ledCount !== ledCount
+        ) {
+            shouldSave = true;
+        }
+
+        return shouldSave;
+    }
+
+    // ✅ ACTUALIZADO: nuevo parámetro ledCount
+    updateDevice(enabled, deviceType, localKey, ledCount = null) {
+        this.tuyaDevice.updateDevice(enabled, deviceType, localKey, ledCount);
+    }
+
+    getDevice() {
+        return this.tuyaDevice;
     }
 }
