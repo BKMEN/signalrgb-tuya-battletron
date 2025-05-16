@@ -20,6 +20,44 @@ export default class TuyaDevice extends TuyaEncryptor
         // {
         //     deviceData = JSON.parse(deviceJson);
         // }
+// Añadir en constructor:
+this.ledCount = deviceData.hasOwnProperty('ledCount') ? deviceData.ledCount : null;
+
+// Modificar toJson():
+toJson() {
+    return {
+        id: this.id,
+        name: this.name,
+        enabled: this.enabled,
+        ip: this.ip,
+        uuid: this.uuid,
+        gwId: this.gwId,
+        version: this.version,
+        productKey: this.productKey,
+        deviceType: this.deviceType,
+        localKey: this.localKey,
+        token: this.token,
+        rnd: this.rnd,
+        crc: this.crc,
+        negotiationKey: this.negotiationKey,
+        sessionKey: this.sessionKey,
+        ledCount: this.ledCount     // 👈 AÑADIDO AQUÍ
+    };
+}
+
+// Modificar updateDevice():
+updateDevice(enabled, deviceType, localKey, ledCount = null) {
+    if (
+        this.validateDeviceUpdate(enabled, deviceType, localKey)
+        || (ledCount !== null && ledCount !== this.ledCount)
+    ) {
+        this.enabled = enabled;
+        this.deviceType = deviceType;
+        this.localKey = localKey;
+        if (ledCount !== null) this.ledCount = ledCount;
+        this.saveToCache();
+    }
+}
 
         this.enabled         = deviceData.hasOwnProperty('enabled') ? deviceData.enabled : false;
         this.deviceType      = deviceData.hasOwnProperty('deviceType') ? deviceData.deviceType : 0;
