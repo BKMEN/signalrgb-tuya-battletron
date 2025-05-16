@@ -37,11 +37,11 @@ Item {
             color: "#1e1e1e"
             border.color: "#444"
             border.width: 1
-            padding: 20
 
             Column {
+                anchors.fill: parent
+                anchors.margins: 20
                 spacing: 16
-                width: parent.width
 
                 Row {
                     spacing: 10
@@ -122,18 +122,17 @@ Item {
             }
         }
 
-        // -------- NUEVA SECCIÓN PARA LEDS Y COLOR --------
         Rectangle {
             width: parent.width
             radius: 10
             color: "#1e1e1e"
             border.color: "#444"
             border.width: 1
-            padding: 20
 
             Column {
+                anchors.fill: parent
+                anchors.margins: 20
                 spacing: 20
-                width: parent.width
 
                 Row {
                     spacing: 10
@@ -187,7 +186,7 @@ Item {
                     onClicked: {
                         service.log("LEDs: " + Math.round(ledCountSlider.value))
                         service.log("Color: R=" + redSlider.value + " G=" + greenSlider.value + " B=" + blueSlider.value)
-                        // Aquí podrías enlazar con una función para enviar al dispositivo
+                        // Aquí enlazar con la lógica real si deseas enviar la configuración
                     }
                 }
             }
