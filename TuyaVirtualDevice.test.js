@@ -3,35 +3,43 @@ import DeviceList from './Data/DeviceList.test.js';
 import TuyaDevice from './TuyaDevice.test.js';
 import { Hex } from './Crypto/Hex.test.js';
 
-export default class TuyaVirtualDevice extends BaseClass {
-    constructor(deviceData) {
+export default class TuyaVirtualDevice extends BaseClass
+{
+    constructor(deviceData)
+    {
         super();
+        // Initialize tuya device from saved data
         this.tuyaDevice = new TuyaDevice(deviceData, null);
         this.frameDelay = 50;
         this.lastRender = 0;
 
         this.setupDevice(this.tuyaDevice);
     }
-
-    getLedNames() {
+    
+    getLedNames()
+    {
         let ledNames = [];
-        for (let i = 1; i <= this.ledCount; i++) {
+        for (let i = 1; i <= this.ledCount; i++)
+        {
             ledNames.push(`Led ${i}`);
         }
         return ledNames;
     }
 
-    getLedPositions() {
+    getLedPositions()
+    {
         let ledPositions = [];
-        for (let i = 0; i < this.ledCount; i++) {
+        for (let i = 0; i < this.ledCount; i++)
+        {
             ledPositions.push([i, 0]);
         }
         return ledPositions;
     }
 
-    setupDevice(tuyaDevice) {
+    setupDevice(tuyaDevice)
+    {
         this.tuyaLeds = DeviceList[tuyaDevice.deviceType].leds;
-        this.ledCount = this.tuyaLeds.length;
+        this.ledCount = (this.tuyaLeds.length > 4) ? 4 : this.tuyaLeds.length;
 
         this.ledNames = this.getLedNames();
         this.ledPositions = this.getLedPositions();
@@ -42,16 +50,20 @@ export default class TuyaVirtualDevice extends BaseClass {
         device.setControllableLeds(this.ledNames, this.ledPositions);
     }
 
-    render(lightingMode, forcedColor, now) {
-        if (now - this.lastRender > this.frameDelay) {
+    render(lightingMode, forcedColor, now)
+    {
+        if (now - this.lastRender > this.frameDelay)
+        {
             this.lastRender = now;
             let RGBData = [];
-            switch (lightingMode) {
+            switch(lightingMode)
+            {
                 case "Canvas":
                     RGBData = this.getDeviceRGB();
                     break;
                 case "Forced":
-                    for (let i = 0; i < this.ledCount; i++) {
+                    for (let i = 0; i < this.ledCount; i++)
+                    {
                         RGBData.push(this.hexToRGB(forcedColor));
                     }
                     break;
@@ -62,52 +74,65 @@ export default class TuyaVirtualDevice extends BaseClass {
         }
     }
 
-    getDeviceRGB() {
+    getDeviceRGB()
+    {
         const RGBData = [];
-        for (let i = 0; i < this.ledPositions.length; i++) {
+    
+        for(let i = 0 ; i < this.ledPositions.length; i++){
             const ledPosition = this.ledPositions[i];
             const color = device.color(ledPosition[0], ledPosition[1]);
             RGBData.push(color);
         }
+    
         return RGBData;
     }
 
-    generateColorString(colors) {
-        const spliceLength = this.tuyaLeds.length;
-        if (colors.length === 1) {
-            const [h, s, v] = this.rgbToHsv(colors[0]);
-            let color = this.getW32FromHex(h.toString(16), 2).toString(Hex) +
-                        this.getW32FromHex(parseInt(s / 10).toString(16), 1).toString(Hex) +
-                        this.getW32FromHex(parseInt(v / 10).toString(16), 1).toString(Hex);
+    generateColorString(colors)
+    {
+        let spliceLength = this.tuyaLeds.length;
+        if (colors.length == 1) spliceLength = 1;
+
+        if (spliceLength === 1)
+        {
+            const [h1,s1,v1] = this.rgbToHsv(colors[0]);
+            let color = this.getW32FromHex(h1.toString(16), 2).toString(Hex) +
+                        this.getW32FromHex(parseInt(s1 / 10).toString(16), 1).toString(Hex) +
+                        this.getW32FromHex(parseInt(v1 / 10).toString(16), 1).toString(Hex);
+
             return color + "00000100";
-        } else {
-            const colorArray = colors.map(color => {
-                const [h, s, v] = this.rgbToHsv(color);
-                return (
+        } else
+        {
+            let colorArray = [];
+
+            for (let color of colors)
+            {
+                const [h,s,v] = this.rgbToHsv(color);
+                colorArray.push(
                     this.getW32FromHex(h.toString(16), 2).toString(Hex) +
                     this.getW32FromHex(s.toString(16), 2).toString(Hex) +
                     this.getW32FromHex(v.toString(16), 2).toString(Hex)
                 );
-            });
-
-            let groupIndex = 1;
-            let groupString = '';
-            for (let i = 0; i < this.tuyaLeds.length; i++) {
-                if (i % 4 === 0 && i !== 0) groupIndex++;
-                groupString += this.zeroPad(groupIndex.toString(16), 2);
             }
 
-            const spliceNumHex = this.getW32FromHex(spliceLength.toString(16), 2).toString(Hex);
-            const colorValue = '0004' + colorArray.join('') + spliceNumHex + groupString;
+            let colorString = '';
 
+            for(let i = 1; i <= this.tuyaLeds.length; i++)
+            {
+                if (i <= 4) {
+                    colorString += '01';
+                } else if (i <= 8) {
+                    colorString += '02';
+                } else if (i <= 12) {
+                    colorString += '03';
+                } else if (i <= 16) {
+                    colorString += '04';
+                }
+            }
+    
+            let spliceNumHex = this.getW32FromHex(spliceLength.toString(16), 2).toString(Hex);
+            let colorValue = '0004' + colorArray.join('') + spliceNumHex + colorString;
+    
             return colorValue;
         }
-    }
-
-    zeroPad(numStr, length) {
-        while (numStr.length < length) {
-            numStr = '0' + numStr;
-        }
-        return numStr;
     }
 }
