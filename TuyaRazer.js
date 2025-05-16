@@ -15,6 +15,9 @@ export function Size() { return [1, 1]; }
 export function DefaultPosition() {return [0, 70]; }
 export function DefaultScale(){return 1.0;}
 export function ControllableParameters()
+export function DiscoveryService() {
+	this.IconUrl = "https://github.com/BKMEN/signalrgb-tuya-battletron/blob/main/assets/logo.png?raw=true";
+}
 {
 	return [
 		{"property":"lightingMode", "group":"settings", "label":"Lighting Mode", "type":"combobox", "values":["Canvas", "Forced"], "default":"Canvas"},
