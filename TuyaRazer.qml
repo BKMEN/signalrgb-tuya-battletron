@@ -22,28 +22,51 @@ Item {
 
         // Campo: Device Type
         ComboBox {
-            id: deviceType
-            width: parent.width
-            model: controller.deviceList
-            textRole: "deviceName"
-            valueRole: "key"
-            currentIndex: controller.deviceList.findIndex(x => x.key === controller.tuyaDevice.deviceType)
-            font.pixelSize: 14
-            color: "white"
-        }
+    id: deviceType
+    width: parent.width
+    model: controller.deviceList
+    textRole: "deviceName"
+    valueRole: "key"
+    currentIndex: controller.deviceList.findIndex(x => x.key === controller.tuyaDevice.deviceType)
+    font.pixelSize: 14
+
+    contentItem: Text {
+        text: deviceType.displayText
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        elide: Text.ElideRight
+        font.pixelSize: 14
+    }
+
+    background: Rectangle {
+        radius: 4
+        color: "#1a1a1a"
+        border.color: "#444"
+    }
+}
+
 
         // Campo: Local Key
         TextField {
-            id: localKey
-            placeholderText: "Local Key"
-            text: controller.tuyaDevice.localKey
-            font.pixelSize: 14
-            color: "white"
-            background: Rectangle {
-                color: "#2a2a2a"
-                radius: 4
-            }
-        }
+    id: localKey
+    placeholderText: "Local Key"
+    text: controller.tuyaDevice.localKey
+    font.pixelSize: 14
+
+    contentItem: TextInput {
+        text: localKey.text
+        color: "white"
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 14
+    }
+
+    background: Rectangle {
+        radius: 4
+        color: "#1a1a1a"
+        border.color: "#444"
+    }
+}
+
 
         // Slider: Cantidad de LEDs
         Row {
