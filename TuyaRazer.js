@@ -7,7 +7,7 @@ import TuyaVirtualDevice from './TuyaVirtualDevice.test.js';
 /* ---------- */
 /*   DEVICE   */
 /* ---------- */
-export function Name() { return "Tuya Razer"; }
+export function Name() { return "Tuya Battletron"; }
 export function Version() { return "0.0.1"; }
 export function Type() { return "network"; }
 export function Publisher() { return "RickOfficial"; }
