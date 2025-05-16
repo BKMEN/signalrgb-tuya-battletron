@@ -1,83 +1,65 @@
-import TuyaDevice from './TuyaDevice.test.js';
+import BaseClass from './Libs/BaseClass.test.js';
 import DeviceList from './Data/DeviceList.test.js';
 
-export default class TuyaController {
-    constructor(deviceData) {
-        this.tuyaDevice = new TuyaDevice(deviceData, null);
+export default class TuyaController extends BaseClass
+{
+    constructor(tuyaDevice)
+    {
+export default class TuyaController extends BaseClass {
+    constructor(tuyaDevice) {
+super();
+this.enabled = false;
+this.id = tuyaDevice.id;
+@@ -14,44 +12,37 @@ export default class TuyaController extends BaseClass
+this.tuyaDevice.on('device:initialized', this.deviceInitialized.bind(this));
+}
 
-        this.deviceList = [];
-        Object.keys(DeviceList).forEach((key) => {
-            this.deviceList.push({
-                key: parseInt(key),
-                deviceName: DeviceList[key].name
-            });
-        });
-    }
+    deviceInitialized()
+    {
+    deviceInitialized() {
+service.log('Device initialized');
+service.log(this);
+        
 
-    get tuyaId() {
-        return this.tuyaDevice.id;
-    }
+this.enabled = true;
+service.removeController(this);
+service.addController(this);
+service.announceController(this);
+}
 
-    get tuyaIp() {
-        return this.tuyaDevice.ip;
-    }
+    getDevices()
+    {
+    getDevices() {
+let devices = [
+{ key: 0, deviceName: 'Select device type' }
+];
+let keys = Object.keys(DeviceList);
+        for (const key of keys)
+        {
+        for (const key of keys) {
+devices.push({ key: key, deviceName: DeviceList[key].name });
+}
+return devices;
+}
 
-    get tuyaKey() {
-        return this.tuyaDevice.localKey;
-    }
+    validateDeviceUpdate(enabled, deviceType, localKey)
+    {
+    validateDeviceUpdate(enabled, deviceType, localKey) {
+return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey);
+}
 
-    get tuyaName() {
-        return this.tuyaDevice.name;
-    }
+    updateDevice(enabled, deviceType, localKey)
+    {
+    updateDevice(enabled, deviceType, localKey) {
+this.tuyaDevice.updateDevice(enabled, deviceType, localKey);
 
-    get tuyaVersion() {
-        return this.tuyaDevice.version;
-    }
-
-    get tuyaEnabled() {
-        return this.tuyaDevice.enabled;
-    }
-
-    get deviceType() {
-        return this.tuyaDevice.deviceType;
-    }
-
-    get deviceList() {
-        return this.deviceList;
-    }
-
-    // ✅ ACTUALIZADO: nuevo parámetro ledCount
-    validateDeviceUpdate(enabled, deviceType, localKey, ledCount = null) {
-        let shouldSave = false;
-
-        if (this.tuyaDevice.enabled !== enabled) {
-            shouldSave = true;
-        }
-
-        if (this.tuyaDevice.deviceType !== deviceType) {
-            shouldSave = true;
-        }
-
-        if (this.tuyaDevice.localKey !== localKey) {
-            shouldSave = true;
-        }
-
-        if (
-            ledCount !== null &&
-            this.tuyaDevice.ledCount !== ledCount
-        ) {
-            shouldSave = true;
-        }
-
-        return shouldSave;
-    }
-
-    // ✅ ACTUALIZADO: nuevo parámetro ledCount
-    updateDevice(enabled, deviceType, localKey, ledCount = null) {
-        this.tuyaDevice.updateDevice(enabled, deviceType, localKey, ledCount);
-    }
-
-    getDevice() {
-        return this.tuyaDevice;
-    }
+// Controller should already exist, but check anyway
+        if (service.hasController(this.id))
+        {
+        if (service.hasController(this.id)) {
+service.updateController(this);
+}
+}
+            
+}
 }
