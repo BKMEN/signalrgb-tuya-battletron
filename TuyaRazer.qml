@@ -1,165 +1,157 @@
-import QtQuick.Layouts 1.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 
 Item {
-    width: 400
-    height: 600
-
-    signal configApplied(int ledCount, color color)
-    signal updateRequested(bool enabled, int deviceType, string localKey)
-
-    property int redValue: 255
-    property int greenValue: 255
-    property int blueValue: 255
-
-    property color selectedColor: Qt.rgba(redValue / 255, greenValue / 255, blueValue / 255)
+    anchors.fill: parent
 
     Column {
-        spacing: 12
-        anchors.centerIn: parent
-        width: parent.width * 0.9
-
-        // Campo: Device Type
-        ComboBox {
-    id: deviceType
-    width: parent.width
-    model: controller.deviceList
-    textRole: "deviceName"
-    valueRole: "key"
-    currentIndex: controller.deviceList.findIndex(x => x.key === controller.tuyaDevice.deviceType)
-    font.pixelSize: 14
-
-    contentItem: Text {
-        text: deviceType.displayText
-        color: "white"
-        verticalAlignment: Text.AlignVCenter
-        elide: Text.ElideRight
-        font.pixelSize: 14
-    }
-
-    background: Rectangle {
-        radius: 4
-        color: "#1a1a1a"
-        border.color: "#444"
-    }
-}
-
-
-        // Campo: Local Key
-        TextField {
-    id: localKey
-    placeholderText: "Local Key"
-    text: controller.tuyaDevice.localKey
-    font.pixelSize: 14
-
-    contentItem: TextInput {
-        text: localKey.text
-        color: "white"
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 14
-    }
-
-    background: Rectangle {
-        radius: 4
-        color: "#1a1a1a"
-        border.color: "#444"
-    }
-}
-
-
-        // Slider: Cantidad de LEDs
-        Row {
-            spacing: 10
-            Label {
-                text: "Cantidad de LEDs:"
-                color: "white"
-            }
-            Slider {
-                id: ledSlider
-                width: 200
-                from: 1
-                to: 50
-                stepSize: 1
-                value: 4
-            }
-            Label {
-                text: ledSlider.value
-                color: "white"
-            }
+        id: headerColumn
+        y: 10
+        width: parent.width - 20
+        spacing: 0
+        Text {
+            color: "#FFFFFF"
+            text: "Configuración de dispositivo Tuya Razer"
+            font.pixelSize: 16
+            font.family: "Poppins"
+            bottomPadding: 10
+            width: parent.width
+            wrapMode: Text.WordWrap
         }
+    }
 
-        // Sliders RGB
-        Column {
-            spacing: 6
+    ListView {
+        id: controllerList
+        model: service.controllers
+        width: parent.width
+        height: parent.height - (headerColumn.height + 20)
+        y: headerColumn.height + 20
+        clip: true
+        spacing: 20
 
-            Row {
-                spacing: 10
-                Label { text: "Rojo:"; color: "white" }
-                Slider {
-                    id: redSlider
-                    from: 0
-                    to: 255
-                    value: 255
-                    onValueChanged: redValue = value
-                    width: 200
-                }
-                Label { text: redValue; color: "white" }
-            }
+        delegate: Item {
+            id: root
+            width: parent.width
+            height: content.height
 
-            Row {
-                spacing: 10
-                Label { text: "Verde:"; color: "white" }
-                Slider {
-                    id: greenSlider
-                    from: 0
-                    to: 255
-                    value: 255
-                    onValueChanged: greenValue = value
-                    width: 200
-                }
-                Label { text: greenValue; color: "white" }
-            }
-
-            Row {
-                spacing: 10
-                Label { text: "Azul:"; color: "white" }
-                Slider {
-                    id: blueSlider
-                    from: 0
-                    to: 255
-                    value: 255
-                    onValueChanged: blueValue = value
-                    width: 200
-                }
-                Label { text: blueValue; color: "white" }
-            }
+            property var controller: model.modelData.obj
 
             Rectangle {
-                width: 80
-                height: 40
-                color: selectedColor
-                radius: 4
-                border.color: "white"
-                border.width: 1
-                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width
+                height: parent.height
+                color: "#1a1a1a"
+                radius: 6
             }
-        }
 
-        // Botón: Aplicar configuración
-        Button {
-            text: "Aplicar configuración"
-            onClicked: configApplied(ledSlider.value, selectedColor)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 14
-        }
+            Column {
+                id: content
+                width: parent.width
+                padding: 15
+                spacing: 12
 
-        // Botón: Actualizar dispositivo
-        Button {
-            text: "Actualizar dispositivo"
-            onClicked: updateRequested(true, deviceType.currentValue, localKey.text)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 14
+                Row {
+                    Switch {
+                        id: enabled
+                        text: "Activado"
+                        checked: controller.tuyaDevice.enabled
+                        onClicked: {
+                            updateButton.enabled = controller.validateDeviceUpdate(
+                                enabled.checked, deviceType.currentValue, localKey.text);
+                        }
+                    }
+                }
+
+                Row {
+                    Text {
+                        color: "#FFFFFF"
+                        text: controller.tuyaDevice.name
+                        font.pixelSize: 18
+                        font.bold: true
+                        font.family: "Poppins"
+                    }
+                }
+
+                Row {
+                    Text {
+                        color: "#CCCCCC"
+                        text: "IP: " + controller.tuyaDevice.ip
+                        font.pixelSize: 14
+                        font.family: "Poppins"
+                    }
+                }
+
+                Row {
+                    Text {
+                        color: "#CCCCCC"
+                        text: "Versión: " + controller.tuyaDevice.version
+                        font.pixelSize: 14
+                        font.family: "Poppins"
+                    }
+                }
+
+                Row {
+                    Text {
+                        color: "#CCCCCC"
+                        text: "Tipo de dispositivo:"
+                        font.pixelSize: 14
+                        font.family: "Poppins"
+                    }
+                }
+
+                ComboBox {
+                    id: deviceType
+                    width: parent.width * 0.9
+                    model: controller.deviceList
+                    textRole: "deviceName"
+                    valueRole: "key"
+                    onActivated: {
+                        updateButton.enabled = controller.validateDeviceUpdate(
+                            enabled.checked, deviceType.currentValue, localKey.text);
+                    }
+                    Component.onCompleted: currentIndex = indexOfValue(controller.tuyaDevice.deviceType)
+                }
+
+                Row {
+                    Text {
+                        color: "#CCCCCC"
+                        text: "Clave local:"
+                        font.pixelSize: 14
+                        font.family: "Poppins"
+                    }
+                }
+
+                TextField {
+                    id: localKey
+                    width: parent.width * 0.9
+                    text: controller.tuyaDevice.localKey
+                    color: "#FFFFFF"
+                    font.pixelSize: 14
+                    font.family: "Poppins"
+                    onTextEdited: {
+                        updateButton.enabled = controller.validateDeviceUpdate(
+                            enabled.checked, deviceType.currentValue, localKey.text);
+                    }
+                }
+
+                Rectangle {
+                    width: 120
+                    height: 36
+                    radius: 6
+                    color: updateButton.enabled ? "#007ACC" : "#555555"
+
+                    ToolButton {
+                        id: updateButton
+                        enabled: false
+                        anchors.fill: parent
+                        text: "Actualizar"
+                        onClicked: {
+                            controller.updateDevice(enabled.checked, deviceType.currentValue, localKey.text);
+                            updateButton.enabled = false;
+                        }
+                    }
+                }
+            }
         }
     }
 }
