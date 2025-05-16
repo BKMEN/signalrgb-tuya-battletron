@@ -8,7 +8,7 @@ Item {
 	spacing: 10
 
 	Image {
-		source: "file://" + service.pluginPath + "/logo.png"
+		source: "file://" + service.pluginPath + "/assets/logo.png"
 		width: 64
 		height: 64
 		fillMode: Image.PreserveAspectFit
@@ -26,7 +26,8 @@ Item {
 		wrapMode: Text.WordWrap
 		horizontalAlignment: Text.AlignHCenter
 	}
-    }
+
+
 
 	ListView {
 		id: controllerList
