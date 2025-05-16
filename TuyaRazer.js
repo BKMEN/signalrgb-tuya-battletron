@@ -10,7 +10,7 @@ import TuyaVirtualDevice from './TuyaVirtualDevice.test.js';
 export function Name() { return "Tuya Battletron"; }
 export function Version() { return "0.0.1"; }
 export function Type() { return "network"; }
-export function Publisher() { return "RickOfficial"; }
+export function Publisher() { return "Yovan"; }
 export function Size() { return [1, 1]; }
 export function DefaultPosition() {return [0, 70]; }
 export function DefaultScale(){return 1.0;}
