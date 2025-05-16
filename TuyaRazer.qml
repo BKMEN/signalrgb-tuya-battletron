@@ -1,6 +1,3 @@
-export function DiscoveryService() {
-	this.IconUrl = "https://github.com/BKMEN/signalrgb-tuya-battletron/blob/main/assets/logo.png?raw=true";
-}
 Item {
     anchors.fill: parent
 
