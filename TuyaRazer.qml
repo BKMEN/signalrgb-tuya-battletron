@@ -1,130 +1,110 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs 1.2
 
+Item {
+    width: 400
+    height: 300
 
-ApplicationWindow {
-    visible: true
-    width: 360
-    height: 320
-    title: "Tuya Razer Settings"
-    color: "#1e1e1e"
-
-    property string lightingMode: "Canvas"
-    property string forcedColor: "#009bde"
-    property string turnOff: "Turn device off"
-    property string shutDownColor: "#8000FF"
-    property int ledCount: 4
+    property alias ledCount: ledSlider.value
+    property color selectedColor: Qt.rgba(redSlider.value / 255, greenSlider.value / 255, blueSlider.value / 255, 1)
 
     ColumnLayout {
         anchors.centerIn: parent
-        spacing: 16
+        spacing: 20
 
-        // MODO DE ILUMINACIÓN
-        RowLayout {
-            spacing: 10
-            Label {
-                text: "Modo de iluminación:"
-                color: "#ffffff"
-                font.pointSize: 11
-            }
-            ComboBox {
-                Layout.fillWidth: true
-                model: ["Canvas", "Forced"]
-                currentIndex: lightingMode === "Canvas" ? 0 : 1
-                onCurrentIndexChanged: lightingMode = currentIndex === 0 ? "Canvas" : "Forced"
-            }
+        Text {
+            text: "Configuración de Tira LED"
+            font.bold: true
+            font.pixelSize: 20
+            Layout.alignment: Qt.AlignHCenter
         }
 
-        // COLOR FORZADO
+        // Slider para cantidad de LEDs
         RowLayout {
-            visible: lightingMode === "Forced"
             spacing: 10
-            Label {
-                text: "Color forzado:"
-                color: "#ffffff"
-                font.pointSize: 11
-            }
-            Rectangle {
-                width: 24
-                height: 24
-                color: forcedColor
-                border.color: "#888"
-                border.width: 1
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: colorDialog.open()
-                }
-            }
-            ColorDialog {
-                id: colorDialog
-                title: "Selecciona un color forzado"
-                currentColor: forcedColor
-                onAccepted: forcedColor = colorDialog.color
-            }
-        }
+            Layout.alignment: Qt.AlignLeft
 
-        // NÚMERO DE LEDS
-        RowLayout {
-            spacing: 10
-            Label {
-                text: "Número de LEDs:"
-                color: "#ffffff"
-                font.pointSize: 11
+            Text {
+                text: "Cantidad de LEDs:"
+                width: 140
             }
-            SpinBox {
-                id: ledCountSpinBox
+
+            Slider {
+                id: ledSlider
                 from: 1
-                to: 120
-                value: ledCount
+                to: 100
                 stepSize: 1
-                onValueChanged: ledCount = value
-            }
-        }
-
-        // COMPORTAMIENTO AL APAGAR
-        RowLayout {
-            spacing: 10
-            Label {
-                text: "Al apagar:"
-                color: "#ffffff"
-                font.pointSize: 11
-            }
-            ComboBox {
-                id: shutdownSelector
+                value: 4
                 Layout.fillWidth: true
-                model: ["Do nothing", "Single color", "Turn device off"]
-                currentIndex: model.indexOf(turnOff)
-                onCurrentIndexChanged: turnOff = model[currentIndex]
+            }
+
+            Text {
+                text: ledSlider.value.toFixed(0)
+                width: 30
+                horizontalAlignment: Text.AlignHCenter
             }
         }
 
-        // COLOR DE APAGADO
-        RowLayout {
-            visible: shutdownSelector.currentText === "Single color"
-            spacing: 10
-            Label {
-                text: "Color de apagado:"
-                color: "#ffffff"
-                font.pointSize: 11
-            }
-            Rectangle {
-                width: 24
-                height: 24
-                color: shutDownColor
-                border.color: "#888"
-                border.width: 1
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: shutdownColorDialog.open()
+        // Sliders de color (R, G, B)
+        ColumnLayout {
+            spacing: 5
+
+            RowLayout {
+                Text { text: "Rojo:"; width: 50 }
+                Slider {
+                    id: redSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
                 }
+                Text { text: redSlider.value.toFixed(0); width: 30 }
             }
-            ColorDialog {
-                id: shutdownColorDialog
-                title: "Selecciona un color de apagado"
-                currentColor: shutDownColor
-                onAccepted: shutDownColor = shutdownColorDialog.color
+
+            RowLayout {
+                Text { text: "Verde:"; width: 50 }
+                Slider {
+                    id: greenSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
+                }
+                Text { text: greenSlider.value.toFixed(0); width: 30 }
+            }
+
+            RowLayout {
+                Text { text: "Azul:"; width: 50 }
+                Slider {
+                    id: blueSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
+                }
+                Text { text: blueSlider.value.toFixed(0); width: 30 }
+            }
+        }
+
+        Rectangle {
+            width: 100
+            height: 40
+            color: selectedColor
+            border.color: "black"
+            border.width: 1
+            radius: 4
+            Layout.alignment: Qt.AlignHCenter
+
+            Text {
+                anchors.centerIn: parent
+                text: "Color actual"
+                font.pixelSize: 10
+                color: "white"
+            }
+        }
+
+        Button {
+            text: "Aplicar configuración"
+            Layout.alignment: Qt.AlignHCenter
+            onClicked: {
+                console.log("Color seleccionado: " + selectedColor)
+                console.log("Cantidad de LEDs: " + ledSlider.value)
+                // Aquí se puede emitir una señal o actualizar el backend JS
             }
         }
     }
