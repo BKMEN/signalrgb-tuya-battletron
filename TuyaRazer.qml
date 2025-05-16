@@ -8,7 +8,7 @@ Item {
         spacing: 10
 
         Image {
-            source: "https://github.com/BKMEN/signalrgb-tuya-battletron/blob/main/assets/logo.png"
+            source: "https://github.com/BKMEN/signalrgb-tuya-battletron/blob/main/assets/logo.png?raw=true"
             width: 64
             height: 64
             fillMode: Image.PreserveAspectFit
