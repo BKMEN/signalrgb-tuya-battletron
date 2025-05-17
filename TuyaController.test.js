@@ -40,17 +40,35 @@ export default class TuyaController extends BaseClass
 
     validateDeviceUpdate(enabled, deviceType, localKey, ledCount = null)
     {
-        return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey, ledCount);
+        return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey)
+            || (ledCount !== null && ledCount !== this.tuyaDevice.ledCount);
     }
 
     updateDevice(enabled, deviceType, localKey, ledCount = null)
     {
         this.tuyaDevice.updateDevice(enabled, deviceType, localKey, ledCount);
 
-        // Controller should already exist, but check anyway
         if (service.hasController(this.id))
         {
             service.updateController(this);
         }
+    }
+
+    // ✅ Nuevo método: Enviar color en vivo desde la interfaz
+    sendColorToDevice(color, ledCount = 4)
+    {
+        const rgb = this.colorToHex(color);
+        const colors = Array(ledCount).fill(rgb);
+        const colorString = this.tuyaDevice.generateColorString(colors);
+        this.tuyaDevice.sendColors(colorString);
+    }
+
+    // ✅ Convierte color Qt.rgba en array RGB [r, g, b]
+    colorToHex(color)
+    {
+        const r = Math.round(color.r * 255);
+        const g = Math.round(color.g * 255);
+        const b = Math.round(color.b * 255);
+        return [r, g, b];
     }
 }
