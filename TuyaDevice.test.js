@@ -15,7 +15,7 @@ export default class TuyaDevice extends TuyaEncryptor {
         this.enabled        = deviceData.hasOwnProperty('enabled') ? deviceData.enabled : false;
         this.deviceType     = deviceData.hasOwnProperty('deviceType') ? deviceData.deviceType : 0;
         this.localKey       = deviceData.hasOwnProperty('localKey') ? deviceData.localKey : null;
-        this.ledCount       = deviceData.hasOwnProperty('ledCount') ? deviceData.ledCount : null;
+        this.ledCount       = deviceData.hasOwnProperty('ledCount') ? deviceData.ledCount : 4;  // ✅ Valor por defecto añadido
 
         this.name           = this.getName();
         this.ip             = deviceData.ip;
@@ -67,7 +67,10 @@ export default class TuyaDevice extends TuyaEncryptor {
             this.enabled = enabled;
             this.deviceType = deviceType;
             this.localKey = localKey;
-            if (ledCount !== null) this.ledCount = ledCount;
+            if (ledCount !== null) {
+                this.ledCount = ledCount;
+                service.log(`Nuevo ledCount para ${this.id}: ${ledCount}`); // ✅ LOG añadido
+            }
             this.saveToCache();
         }
     }
