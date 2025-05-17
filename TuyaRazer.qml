@@ -59,7 +59,7 @@ Item {
                         checked: controller.tuyaDevice.enabled
                         onClicked: {
                             updateButton.enabled = controller.validateDeviceUpdate(
-                                enabled.checked, deviceType.currentValue, localKey.text);
+                                enabled.checked, deviceType.currentValue, localKey.text, ledSlider.value);
                         }
                     }
                 }
@@ -76,7 +76,7 @@ Item {
                     textRole: "deviceName"
                     valueRole: "key"
                     onActivated: updateButton.enabled = controller.validateDeviceUpdate(
-                        enabled.checked, deviceType.currentValue, localKey.text)
+                        enabled.checked, deviceType.currentValue, localKey.text, ledSlider.value)
                     Component.onCompleted: currentIndex = indexOfValue(controller.tuyaDevice.deviceType)
                 }
 
@@ -89,7 +89,7 @@ Item {
                     font.pixelSize: 14
                     font.family: "Poppins"
                     onTextEdited: updateButton.enabled = controller.validateDeviceUpdate(
-                        enabled.checked, deviceType.currentValue, localKey.text)
+                        enabled.checked, deviceType.currentValue, localKey.text, ledSlider.value)
                 }
 
                 Rectangle {
@@ -102,7 +102,12 @@ Item {
                         anchors.fill: parent
                         text: "Actualizar"
                         onClicked: {
-                            controller.updateDevice(enabled.checked, deviceType.currentValue, localKey.text)
+                            controller.updateDevice(
+                                enabled.checked,
+                                deviceType.currentValue,
+                                localKey.text,
+                                ledSlider.value
+                            )
                             updateButton.enabled = false
                         }
                     }
@@ -131,7 +136,17 @@ Item {
             Layout.alignment: Qt.AlignLeft
 
             Text { text: "Cantidad de LEDs:"; color: "#CCCCCC"; width: 140 }
-            Slider { id: ledSlider; from: 1; to: 100; stepSize: 1; value: 4; Layout.fillWidth: true }
+            Slider {
+                id: ledSlider
+                from: 1
+                to: 100
+                stepSize: 1
+                value: 4
+                Layout.fillWidth: true
+                onValueChanged: {
+                    controller.sendColorToDevice(selectedColor, value)
+                }
+            }
             Text { text: ledSlider.value.toFixed(0); color: "#CCCCCC"; width: 30; horizontalAlignment: Text.AlignHCenter }
         }
 
@@ -140,19 +155,34 @@ Item {
 
             RowLayout {
                 Text { text: "Rojo:"; color: "#CCCCCC"; width: 50 }
-                Slider { id: redSlider; from: 0; to: 255; value: 255; Layout.fillWidth: true }
+                Slider {
+                    id: redSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
+                    onValueChanged: controller.sendColorToDevice(selectedColor, ledSlider.value)
+                }
                 Text { text: redSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
             }
 
             RowLayout {
                 Text { text: "Verde:"; color: "#CCCCCC"; width: 50 }
-                Slider { id: greenSlider; from: 0; to: 255; value: 255; Layout.fillWidth: true }
+                Slider {
+                    id: greenSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
+                    onValueChanged: controller.sendColorToDevice(selectedColor, ledSlider.value)
+                }
                 Text { text: greenSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
             }
 
             RowLayout {
                 Text { text: "Azul:"; color: "#CCCCCC"; width: 50 }
-                Slider { id: blueSlider; from: 0; to: 255; value: 255; Layout.fillWidth: true }
+                Slider {
+                    id: blueSlider
+                    from: 0; to: 255; value: 255
+                    Layout.fillWidth: true
+                    onValueChanged: controller.sendColorToDevice(selectedColor, ledSlider.value)
+                }
                 Text { text: blueSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
             }
         }
@@ -169,9 +199,7 @@ Item {
             text: "Aplicar configuración"
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
-                console.log("Color seleccionado: " + selectedColor)
-                console.log("Cantidad de LEDs: " + ledSlider.value)
-                // Aquí se puede emitir una señal o actualizar el backend JS
+                controller.sendColorToDevice(selectedColor, ledSlider.value)
             }
         }
     }
