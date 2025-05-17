@@ -8,6 +8,13 @@ Item {
     property alias ledCount: ledSlider.value
     property color selectedColor: Qt.rgba(redSlider.value / 255, greenSlider.value / 255, blueSlider.value / 255, 1)
 
+    function syncColor() {
+        // Para el primer controlador encontrado. Si tienes varios, ajusta la lógica.
+        if (controllerList.count > 0 && controllerList.currentItem && controllerList.currentItem.controller.applyColor) {
+            controllerList.currentItem.controller.applyColor(selectedColor)
+        }
+    }
+
     Column {
         id: headerColumn
         anchors.margins: 10
@@ -107,6 +114,11 @@ Item {
                         onValueChanged: {
                             updateButton.enabled = controller.validateDeviceUpdate(
                                 enabled.checked, deviceType.currentValue, localKey.text, ledSlider.value);
+                            // (OPCIONAL) Sincroniza ledCount en tiempo real
+                            if (controller && controller.updateDevice) {
+                                controller.updateDevice(
+                                    enabled.checked, deviceType.currentValue, localKey.text, ledSlider.value)
+                            }
                         }
                     }
                     Text {
@@ -161,7 +173,10 @@ Item {
                 id: redSlider
                 from: 0; to: 255; value: 255
                 Layout.fillWidth: true
-                onValueChanged: previewRect.color = selectedColor
+                onValueChanged: {
+                    previewRect.color = selectedColor
+                    syncColor()
+                }
             }
             Text { text: redSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
         }
@@ -175,7 +190,10 @@ Item {
                 id: greenSlider
                 from: 0; to: 255; value: 255
                 Layout.fillWidth: true
-                onValueChanged: previewRect.color = selectedColor
+                onValueChanged: {
+                    previewRect.color = selectedColor
+                    syncColor()
+                }
             }
             Text { text: greenSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
         }
@@ -189,7 +207,10 @@ Item {
                 id: blueSlider
                 from: 0; to: 255; value: 255
                 Layout.fillWidth: true
-                onValueChanged: previewRect.color = selectedColor
+                onValueChanged: {
+                    previewRect.color = selectedColor
+                    syncColor()
+                }
             }
             Text { text: blueSlider.value.toFixed(0); color: "#CCCCCC"; width: 30 }
         }
@@ -213,11 +234,7 @@ Item {
         Button {
             text: "Aplicar configuración"
             Layout.alignment: Qt.AlignHCenter
-            onClicked: {
-                console.log("LEDs: " + ledSlider.value)
-                console.log("Color: " + selectedColor)
-                // Aquí puedes emitir una señal para enviar el color al backend
-            }
+            onClicked: syncColor
         }
     }
 }
