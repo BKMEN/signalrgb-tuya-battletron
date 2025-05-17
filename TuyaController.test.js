@@ -18,7 +18,7 @@ export default class TuyaController extends BaseClass
     {
         service.log('Device initialized');
         service.log(this);
-        
+
         this.enabled = true;
         service.removeController(this);
         service.addController(this);
@@ -38,14 +38,14 @@ export default class TuyaController extends BaseClass
         return devices;
     }
 
-    validateDeviceUpdate(enabled, deviceType, localKey)
+    validateDeviceUpdate(enabled, deviceType, localKey, ledCount = null)
     {
-        return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey);
+        return this.tuyaDevice.validateDeviceUpdate(enabled, deviceType, localKey, ledCount);
     }
 
-    updateDevice(enabled, deviceType, localKey)
+    updateDevice(enabled, deviceType, localKey, ledCount = null)
     {
-        this.tuyaDevice.updateDevice(enabled, deviceType, localKey);
+        this.tuyaDevice.updateDevice(enabled, deviceType, localKey, ledCount);
 
         // Controller should already exist, but check anyway
         if (service.hasController(this.id))
@@ -53,5 +53,4 @@ export default class TuyaController extends BaseClass
             service.updateController(this);
         }
     }
-            
 }
